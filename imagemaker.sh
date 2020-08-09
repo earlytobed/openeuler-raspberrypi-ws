@@ -21,7 +21,7 @@ dnf --installroot=${WORKDIR}/rootfs/ install dnf --nogpgcheck -y
 
 # others
 dnf --installroot=${WORKDIR}/rootfs/ makecache
-dnf --installroot=${WORKDIR}/rootfs/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth
+dnf --installroot=${WORKDIR}/rootfs/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth security-tool
 
 # Configs
 ## hosts
@@ -54,8 +54,7 @@ mount --bind /dev ${WORKDIR}/rootfs/dev
 mount -t proc /proc ${WORKDIR}/rootfs/proc
 mount -t sysfs /sys ${WORKDIR}/rootfs/sys
 ## chroot
-chroot ${WORKDIR}/rootfs /bin/bash
-## ssh
+chroot ${WORKDIR}/rootfs /bin/bash<<EOF
 systemctl enable ssh
 ## passwd root
 passwd root
@@ -67,19 +66,38 @@ ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 systemctl enable hciuart
 ## exit
 exit
+EOF
 ## umount
 umount -l ${WORKDIR}/rootfs/dev
 umount -l ${WORKDIR}/rootfs/proc
 umount -l ${WORKDIR}/rootfs/sys
 
+# boottemp
+mkdir ${WORKDIR}/boottemp
+## copy boot
+cd ${WORKDIR}/firmware/boot
+tar cf ${WORKDIR}/boot.tar ./
+cd ${WORKDIR}/boottemp
+tar xf ${WORKDIR}/boot.tar -C .
+# boot
+cd ${WORKDIR}/boottemp
+# delete useless
+rm *.dtb cmdline.txt kernel.img kernel7.img
+# add cmdline.txt
+echo "console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p3 rootfstype=ext4 elevator=deadline rootwait" > cmdline.txt
+# kernel
+cp ${WORKDIR}/${KERNEL_REPO}/Image ${WORKDIR}/boottemp/kernel8.img
+# device tree
+cp ${WORKDIR}/${KERNEL_REPO}/*.dtb ${WORKDIR}/boottemp/
+cp ${WORKDIR}/${KERNEL_REPO}/overlays/* ${WORKDIR}/boottemp/overlays/
+
 # make image
 ## du
-BOOT_SIZE=du -sh --block-size=1MiB ${WORKDIR}/firmware/boot | awk '{print $1}'
-ROOTFS_SIZE=du -sh --block-size=1MiB ${WORKDIR}/rootfs | awk '{print $1}'
+BOOT_SIZE=$(du -sh --block-size=1MiB ${WORKDIR}/boottemp | awk '{print $1}')
+ROOTFS_SIZE=$(du -sh --block-size=1MiB ${WORKDIR}/rootfs | awk '{print $1}')
 ## image
 cd ${WORKDIR}
-dd if=/dev/zero of=openEuler_raspi.img bs=1M count=???
-
+dd if=/dev/zero of=openEuler_raspi.img bs=1M count=$[BOOT_SIZE+ROOTFS_SIZE+300]
 # fdisk 
 FDISK=$(which fdisk)
 ${FDISK} openEuler_raspi.img &> /dev/null <<EOF
@@ -87,12 +105,12 @@ n
 p
 1
 
-+${BOOT_SIZE}M
++$[${BOOT_SIZE}+50]M
 n
 p
 2
 
-+${ROOTFS_SIZE}M
++$[${ROOTFS_SIZE}+50]M
 n
 p
 3
@@ -101,7 +119,7 @@ p
 wq
 EOF
 ## losetup
-LOOP_DEVICE=$(losetup -f --show openEuler_raspi.img) | tr -d "/dev/loop"
+LOOP_DEVICE=$(losetup -f --show openEuler_raspi.img | tr -d "/dev/loop")
 ## kpartx
 kpartx -av /dev/loop${LOOP_DEVICE}
 ## format
@@ -141,21 +159,10 @@ cd ${WORKDIR}/root
 tar xpf ${WORKDIR}/rootfs.tar -C .
 
 ## copy boot
-cd ${WORKDIR}/firmware/boot
+cd ${WORKDIR}/boottemp
 tar cf ${WORKDIR}/boot.tar ./
 cd ${WORKDIR}/boot
 tar xf ${WORKDIR}/boot.tar -C .
-# boot
-cd ${WORKDIR}/boot
-# delete useless
-rm *.dtb cmdline.txt kernel.img kernel7.img
-# add cmdline.txt
-echo "console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p3 rootfstype=ext4 elevator=deadline rootwait" > cmdline.txt
-# kernel
-cp ${WORKDIR}/${KERNEL_REPO}/Image ${WORKDIR}/boot/kernel8.img
-# device tree
-cp ${WORKDIR}/output/*.dtb ${WORKDIR}/boot/
-cp ${WORKDIR}/output/overlays/* ${WORKDIR}/boot/overlays/
 
 # save and umount
 ## sync
