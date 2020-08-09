@@ -1,6 +1,7 @@
 #!/bin/bash
 # Env
 export WORKDIR=$(pwd)
+export KERNEL_REPO=kernel
 
 # RPM db
 mkdir ${WORKDIR}/rootfs
@@ -111,7 +112,7 @@ mkfs.ext4 /dev/mapper/loop${LOOP_DEVICE}p2
 ## swap
 mkswap /dev/mapper/loop${LOOP_DEVICE}p3
 
-## 
+## mkdir root boot
 mkdir ${WORKDIR}/root ${WORKDIR}/boot
 # mount
 mount -t vfat -o uid=root,gid=root,umask=0000 /dev/mapper/loop${LOOP_DEVICE}p1 ${WORKDIR}/boot/
@@ -138,11 +139,23 @@ cd ${WORKDIR}/rootfs/
 tar cpf ${WORKDIR}/rootfs.tar .
 cd ${WORKDIR}/root
 tar xpf ${WORKDIR}/rootfs.tar -C .
+
 ## copy boot
 cd ${WORKDIR}/firmware/boot
 tar cf ${WORKDIR}/boot.tar ./
 cd ${WORKDIR}/boot
 tar xf ${WORKDIR}/boot.tar -C .
+# boot
+cd ${WORKDIR}/boot
+# delete useless
+rm *.dtb cmdline.txt kernel.img kernel7.img
+# add cmdline.txt
+echo "console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p3 rootfstype=ext4 elevator=deadline rootwait" > cmdline.txt
+# kernel
+cp ${WORKDIR}/${KERNEL_REPO}/Image ${WORKDIR}/boot/kernel8.img
+# device tree
+cp ${WORKDIR}/output/*.dtb ${WORKDIR}/boot/
+cp ${WORKDIR}/output/overlays/* ${WORKDIR}/boot/overlays/
 
 # save and umount
 ## sync
