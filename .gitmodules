@@ -16,3 +16,6 @@
 [submodule "pi-bluetooth"]
 	path = pi-bluetooth
 	url = https://github.com/RPi-Distro/pi-bluetooth
+[submodule "raspberrypi-sys-mods"]
+	path = raspberrypi-sys-mods
+	url = https://github.com/RPi-Distro/raspberrypi-sys-mods
