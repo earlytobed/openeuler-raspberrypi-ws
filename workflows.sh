@@ -3,7 +3,7 @@
 export WORKDIR=$(pwd)
 export SOURCE=raspberrypi-kernel
 export OUTPUT=temp
-export OUTPUT_REPO=kernel
+export KERNEL_REPO=kernel
 export ARCH=arm64
 export TARGET=shrink_defconfig
 
@@ -11,12 +11,12 @@ export TARGET=shrink_defconfig
 ## mkdir
 cd ${WORKDIR}
 mkdir ${OUTPUT}
-mkdir ${OUTPUT_REPO}
+mkdir ${KERNEL_REPO}
 
 ## clean
 cd ${WORKDIR}/${SOURCE}
 make mrproper
-cd ${WORKDIR}/${OUTPUT_REPO}
+cd ${WORKDIR}/${KERNEL_REPO}
 git rm -r .
 cd ${WORKDIR}/${OUTPUT}
 rm -rf *
@@ -46,9 +46,9 @@ SIZE=$(du -d 0 ${OUTPUT} | awk '{print $1}')
 ## target_defconfig
 cp ${WORKDIR}/${SOURCE}/arch/${ARCH}/configs/${TARGET} ${WORKDIR}/${OUTPUT}
 ## mv
-cp -rf ${WORKDIR}/${OUTPUT}/* ${WORKDIR}/${OUTPUT_REPO}/
+cp -rf ${WORKDIR}/${OUTPUT}/* ${WORKDIR}/${KERNEL_REPO}/
 
 # Git
-cd ${WORKDIR}/${OUTPUT_REPO}
+cd ${WORKDIR}/${KERNEL_REPO}
 git add .
 git commit -m "${SIZE}"

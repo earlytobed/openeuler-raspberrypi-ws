@@ -1,8 +1,6 @@
 #!/bin/bash
 # Check
-if [ $(whoami) = root ]; then
-    echo "I'm root."
-else
+if [ $(whoami) != root ]; then
     echo "Oops! Pleasr run as root."
     sudo ./$0
     exit 1
