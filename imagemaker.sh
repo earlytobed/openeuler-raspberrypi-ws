@@ -55,12 +55,13 @@ mount -t proc /proc ${WORKDIR}/rootfs/proc
 mount -t sysfs /sys ${WORKDIR}/rootfs/sys
 ## chroot
 chroot ${WORKDIR}/rootfs /bin/bash<<EOF
-systemctl enable ssh
+systemctl enable sshd
 ## passwd root
-passwd root
+#passwd root
 ## hostname
 echo openEuler-raspberrypi > /etc/hostname
 ## timezone
+rm -f /etc/localtime
 ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 ## hciuart
 systemctl enable hciuart
@@ -84,7 +85,7 @@ cd ${WORKDIR}/boottemp
 # delete useless
 rm *.dtb cmdline.txt kernel.img kernel7.img
 # add cmdline.txt
-echo "console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p3 rootfstype=ext4 elevator=deadline rootwait" > cmdline.txt
+echo "console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait" > cmdline.txt
 # kernel
 cp ${WORKDIR}/${KERNEL_REPO}/Image ${WORKDIR}/boottemp/kernel8.img
 # device tree
@@ -97,7 +98,7 @@ BOOT_SIZE=$(du -sh --block-size=1MiB ${WORKDIR}/boottemp | awk '{print $1}')
 ROOTFS_SIZE=$(du -sh --block-size=1MiB ${WORKDIR}/rootfs | awk '{print $1}')
 ## image
 cd ${WORKDIR}
-dd if=/dev/zero of=openEuler_raspi.img bs=1M count=$[BOOT_SIZE+ROOTFS_SIZE+300]
+dd if=/dev/zero of=openEuler_raspi.img bs=1M count=$[BOOT_SIZE+ROOTFS_SIZE+500]
 # fdisk 
 FDISK=$(which fdisk)
 ${FDISK} openEuler_raspi.img &> /dev/null <<EOF
@@ -105,12 +106,12 @@ n
 p
 1
 
-+$[${BOOT_SIZE}+50]M
++$[${BOOT_SIZE}+200]M
 n
 p
 2
 
-+$[${ROOTFS_SIZE}+50]M
++$[${ROOTFS_SIZE}+200]M
 n
 p
 3
@@ -167,9 +168,12 @@ tar xf ${WORKDIR}/boot.tar -C .
 # save and umount
 ## sync
 sync
+## wait
+sleep 5
 ## umount
-umount ${WORKDIR}/root
-umount ${WORKDIR}/boot
+cd ${WORKDIR}
+umount root
+umount boot
 kpartx -d /dev/loop${LOOP_DEVICE}
 losetup -d /dev/loop${LOOP_DEVICE}
 
