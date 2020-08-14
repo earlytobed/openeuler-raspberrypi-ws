@@ -5,7 +5,7 @@ export KERNEL_REPO=kernel
 
 clean(){
     cd ${WORKDIR}
-    rm -rf openEuler_raspi.img rootfs/ boot/ root/
+    rm -rf openEuler_raspi.img rootfs/ boot/ root/ rootfs.tar
 }
 
 prepare_rootfs(){
@@ -123,7 +123,10 @@ after_mount_copy_boot(){
 }
 
 after_mount_copy_rootfs(){
-    cp -r ${WORKDIR}/rootfs/* ${WORKDIR}/root/
+    cd ${WORKDIR}/rootfs/
+    tar cpf ${WORKDIR}/rootfs.tar .
+    cd ${WORKDIR}/root
+    tar xpf ${WORKDIR}/rootfs.tar -C .
 }
 
 sync_and_umount(){
