@@ -6,3 +6,8 @@ export target=shrink_defconfig
 
 make ${target}
 make menuconfig
+
+read -p "\cp .config arch/${ARCH}/configs/${target} ?" yesorno
+if [ $yesorno == "yes" ]; then
+    \cp .config arch/${ARCH}/configs/${target}
+fi
