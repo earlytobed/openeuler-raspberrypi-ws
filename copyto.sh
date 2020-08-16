@@ -2,7 +2,6 @@
 # Check
 if [ $(whoami) != root ]; then
     echo "Oops! Pleasr run as root."
-    sudo ./$0
     exit 1
 fi
 
@@ -26,14 +25,16 @@ mkdir ${boot}
 mount /dev/sdc1 ${boot}
 echo "mount ${boot}"
 mkdir ${rootfs}
-mount /dev/sdc3 ${rootfs}
+mount /dev/sdc2 ${rootfs}
 echo "mount ${rootfs}"
 
 # mv
-cp -r ${KERNELDIR}/lib/modules ${rootfs}/lib/
+cp -a ${KERNELDIR}/lib/modules ${rootfs}/lib/
 cp ${KERNELDIR}/Image ${boot}/kernel8.img
 cp ${KERNELDIR}/*.dtb ${boot}/
 cp ${KERNELDIR}/overlays/* ${boot}/overlays/
+rm -rf ${rootfs}/modules/*
+cp -a ${KERNELDIR}/lib/modules/* ${rootfs}/modules/
 echo "copy complete"
 
 # umount

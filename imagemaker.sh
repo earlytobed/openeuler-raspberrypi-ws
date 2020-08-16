@@ -33,22 +33,22 @@ prepare_rootfs(){
     ### Use rootfs-sample
     ## IP Auto
     ### Use rootfs-sample
-    cp -r roorfs-sample/etc/* ${WORKDIR}/rootfs/etc/
+    cp -a rootfs-sample/etc/* ${WORKDIR}/rootfs/etc/
 
     # firmware
     mkdir -p ${WORKDIR}/rootfs/lib/firmware ${WORKDIR}/rootfs/usr/bin ${WORKDIR}/rootfs/lib/udev/rules.d ${WORKDIR}/rootfs/lib/systemd/system
-    cp ${WORKDIR}/bluez-firmware/broadcom/* ${WORKDIR}/rootfs/lib/firmware/
-    cp -r ${WORKDIR}/firmware-nonfree/brcm/ ${WORKDIR}/rootfs/lib/firmware/
-    cp raspberrypi-sys-mods/etc.armhf/udev/rules.d/99-com.rules ${WORKDIR}/rootfs/lib/udev/rules.d/
-    cp pi-bluetooth/usr/bin/* ${WORKDIR}/rootfs/usr/bin/
-    cp pi-bluetooth/lib/udev/rules.d/90-pi-bluetooth.rules ${WORKDIR}/rootfs/lib/udev/rules.d/
-    cp pi-bluetooth/debian/pi-bluetooth.bthelper\@.service ${WORKDIR}/rootfs/lib/systemd/system/bthelper\@.service
-    cp pi-bluetooth/debian/pi-bluetooth.hciuart.service ${WORKDIR}/rootfs/lib/systemd/system/hciuart.service
+    cp -a ${WORKDIR}/bluez-firmware/broadcom/* ${WORKDIR}/rootfs/lib/firmware/
+    cp -a ${WORKDIR}/firmware-nonfree/brcm/ ${WORKDIR}/rootfs/lib/firmware/
+    cp -a raspberrypi-sys-mods/etc.armhf/udev/rules.d/99-com.rules ${WORKDIR}/rootfs/lib/udev/rules.d/
+    cp -a pi-bluetooth/usr/bin/* ${WORKDIR}/rootfs/usr/bin/
+    cp -a pi-bluetooth/lib/udev/rules.d/90-pi-bluetooth.rules ${WORKDIR}/rootfs/lib/udev/rules.d/
+    cp -a pi-bluetooth/debian/pi-bluetooth.bthelper\@.service ${WORKDIR}/rootfs/lib/systemd/system/bthelper\@.service
+    cp -a pi-bluetooth/debian/pi-bluetooth.hciuart.service ${WORKDIR}/rootfs/lib/systemd/system/hciuart.service
     ## bluetooth
     mv ${WORKDIR}/rootfs/lib/firmware/BCM43430A1.hcd ${WORKDIR}/rootfs/lib/firmware/brcm/
     mv ${WORKDIR}/rootfs/lib/firmware/BCM4345C0.hcd ${WORKDIR}/rootfs/lib/firmware/brcm/
     ## kernel object
-    cp -r ${WORKDIR}/${KERNEL_REPO}/lib/modules ${WORKDIR}/rootfs/lib/
+    cp -a ${WORKDIR}/${KERNEL_REPO}/lib/modules ${WORKDIR}/rootfs/lib/
 
     ## size
     ROOTFS_SIZE=$(du -sh --block-size=1MiB ${WORKDIR}/rootfs | awk '{print $1}')
