@@ -25,7 +25,7 @@ prepare_rootfs(){
     dnf --installroot=${WORKDIR}/rootfs/ install dnf --nogpgcheck -y
     # others
     dnf --installroot=${WORKDIR}/rootfs/ makecache
-    dnf --installroot=${WORKDIR}/rootfs/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth security-tool
+    dnf --installroot=${WORKDIR}/rootfs/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth security-tool crda
     # Configs
     ## hosts
     ### Use rootfs-sample
@@ -66,7 +66,7 @@ rootfs_config(){
     ## timezone
     ## hciuart
     ## exit
-    chroot ${WORKDIR}/rootfs /bin/bash -c "systemctl enable sshd; echo root:admin | chpasswd;echo openEuler-raspberrypi > /etc/hostname; rm -f /etc/localtime; ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime; systemctl enable hciuart; exit;"
+    chroot ${WORKDIR}/rootfs /bin/bash -c "systemctl enable sshd; echo root:admin | chpasswd; echo openEuler-raspberrypi > /etc/hostname; rm -f /etc/localtime; ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime; systemctl enable hciuart; iw reg set CN; exit;"
     ## umount
     umount -l ${WORKDIR}/rootfs/dev
     umount -l ${WORKDIR}/rootfs/proc
