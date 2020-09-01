@@ -15,6 +15,11 @@ prepare_rootfs(){
     mkdir -p ${WORKDIR}/rootfs/var/lib/rpm
     rpm --root ${WORKDIR}/rootfs/ --initdb
 
+    # test locale shrink
+    mkdir -p ${WORKDIR}/rootfs/etc/rpm
+    chmod a+rX ${WORKDIR}/rootfs/etc/rpm
+    echo "%_install_langs en_US" > ${WORKDIR}/rootfs/etc/rpm/macros.image-language-conf
+
     # openEuler
     # 会在 ${WORKDIR}/rootfs 下生成三个文件夹: etc/ usr/ var/
     rpm -ivh --nodeps --root ${WORKDIR}/rootfs/ http://repo.openeuler.org/openEuler-20.03-LTS/everything/aarch64/Packages/openEuler-release-20.03LTS-33.oe1.aarch64.rpm
@@ -103,9 +108,7 @@ create_image_parted_losetup_kpartx_format_mkdir_mount_fstab(){
     # SWAP_UUID=$(blkid -s UUID -o value /dev/mapper/loop${LOOP_DEVICE}p3)
 
     # fstab
-    echo "UUID=${BOOT_UUID}      /boot   vfat    defaults,noatime 0 0" > ${WORKDIR}/rootfs/etc/fstab
-    echo "UUID=${ROOTFS_UUID}    /       ext4    defaults,noatime 0 0" >> ${WORKDIR}/rootfs/etc/fstab
-    # echo "UUID=${SWAP_UUID}      swap    swap    defaults,noatime 0 0" >> ${WORKDIR}/rootfs/etc/fstab
+    echo -e "UUID=${BOOT_UUID}      /boot   vfat    defaults,noatime 0 0\nUUID=${ROOTFS_UUID}    /       ext4    defaults,noatime 0 0\nUUID=${SWAP_UUID}      swap    swap    defaults,noatime 0 0" > ${WORKDIR}/rootfs/etc/fstab
 }
 
 after_mount_copy_boot(){
