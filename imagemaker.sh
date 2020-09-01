@@ -82,7 +82,7 @@ create_image_parted_losetup_kpartx_format_mkdir_mount_fstab(){
     cd ${WORKDIR}
     # dd
     # dd if=/dev/zero of=openEuler_raspi.img bs=1M count=$[BOOT_SIZE+ROOTFS_SIZE+500]
-    dd if=/dev/zero of=openEuler_raspi.img bs=1M count=1600
+    dd if=/dev/zero of=openEuler_raspi.img bs=1M count=1800
     # parted
     parted -s openEuler_raspi.img mklabel msdos mkpart primary fat32 4M 64M set 1 boot on set 1 lba on mkpart primary ext4 64M 100%
     # losetup
@@ -146,9 +146,11 @@ sync_and_umount(){
     losetup -d /dev/loop${LOOP_DEVICE}
 }
 
-if [ $1 == "clean" ]; then
-    clean && exit 0
-    echo "cleaning"
+if [ -n "$1" ]; then
+    if [ $1 == "clean" ]; then
+        echo "cleaning"
+        clean && exit 0
+    fi
 fi
 
 clean
