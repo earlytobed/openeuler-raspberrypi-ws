@@ -108,7 +108,8 @@ create_image_parted_losetup_kpartx_format_mkdir_mount_fstab(){
     # SWAP_UUID=$(blkid -s UUID -o value /dev/mapper/loop${LOOP_DEVICE}p3)
 
     # fstab
-    echo -e "UUID=${BOOT_UUID}      /boot   vfat    defaults,noatime 0 0\nUUID=${ROOTFS_UUID}    /       ext4    defaults,noatime 0 0\nUUID=${SWAP_UUID}      swap    swap    defaults,noatime 0 0" > ${WORKDIR}/rootfs/etc/fstab
+    # echo -e "UUID=${BOOT_UUID}      /boot   vfat    defaults,noatime 0 0\nUUID=${ROOTFS_UUID}    /       ext4    defaults,noatime 0 0\nUUID=${SWAP_UUID}      swap    swap    defaults,noatime 0 0" > ${WORKDIR}/rootfs/etc/fstab
+    echo -e "UUID=${BOOT_UUID}      /boot   vfat    defaults,noatime 0 0\nUUID=${ROOTFS_UUID}    /       ext4    defaults,noatime 0 0" > ${WORKDIR}/rootfs/etc/fstab
 }
 
 after_mount_copy_boot(){
