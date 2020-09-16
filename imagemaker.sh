@@ -5,7 +5,7 @@ export KERNEL_REPO=kernel
 
 clean(){
     cd ${WORKDIR}
-    rm -rf openEuler_raspi.img rootfs/ boot/ root/ rootfs.tar
+    rm -rf openEuler_raspi.img openEuler_raspi.img.gz rootfs/ boot/ root/ rootfs.tar
 }
 
 prepare_rootfs(){
@@ -161,4 +161,5 @@ create_image_parted_losetup_kpartx_format_mkdir_mount_fstab
 after_mount_copy_boot
 after_mount_copy_rootfs
 sync_and_umount
+gzip openEuler_raspi.img
 echo done!
