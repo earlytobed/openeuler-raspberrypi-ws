@@ -39,7 +39,7 @@ enabled=1
 gpgcheck=0" > ${WORKDIR}/rootfs/etc/yum.repos.d/openEuler-20.03-LTS.repo
 
     # dnf
-    dnf --installroot=${WORKDIR}/rootfs/ localinstall ./dnf-4.2.15-8.noarch.rpm --nogpgcheck
+    dnf --installroot=${WORKDIR}/rootfs/ install dnf --nogpgcheck
     # others
     # dnf --installroot=${WORKDIR}/rootfs/ makecache
     # dnf --installroot=${WORKDIR}/rootfs/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth security-tool crda
