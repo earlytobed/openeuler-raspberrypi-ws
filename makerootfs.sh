@@ -25,7 +25,19 @@ prepare_rootfs(){
     rpm -ivh --nodeps --root ${WORKDIR}/rootfs/ http://repo.openeuler.org/openEuler-20.03-LTS/everything/aarch64/Packages/openEuler-release-20.03LTS-33.oe1.aarch64.rpm
     # yum
     mkdir -p ${WORKDIR}/rootfs/etc/yum.repos.d
-    curl -o ${WORKDIR}/rootfs/etc/yum.repos.d/openEuler-20.03-LTS.repo https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo
+    # curl -o ${WORKDIR}/rootfs/etc/yum.repos.d/openEuler-20.03-LTS.repo https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo
+    echo -e "[OS]
+name=OS
+baseurl=https://isrc.iscas.ac.cn/eulixos/repo/test/1/packages/aarch64/
+enabled=1
+gpgcheck=0
+
+[source]
+name=source
+baseurl=https://isrc.iscas.ac.cn/eulixos/repo/test/1/packages/source/
+enabled=1
+gpgcheck=0" > ${WORKDIR}/rootfs/etc/yum.repos.d/openEuler-20.03-LTS.repo
+
     # dnf
     dnf --installroot=${WORKDIR}/rootfs/ localinstall ./dnf-4.2.15-8.noarch.rpm --nogpgcheck
     # others
