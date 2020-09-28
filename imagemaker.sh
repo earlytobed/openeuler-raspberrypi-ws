@@ -18,19 +18,42 @@ prepare_rootfs(){
     # test locale shrink
     mkdir -p ${WORKDIR}/rootfs/etc/rpm
     chmod a+rX ${WORKDIR}/rootfs/etc/rpm
-    echo "%_install_langs en_US" > ${WORKDIR}/rootfs/etc/rpm/macros.image-language-conf
 
     # openEuler
     # 会在 ${WORKDIR}/rootfs 下生成三个文件夹: etc/ usr/ var/
     rpm -ivh --nodeps --root ${WORKDIR}/rootfs/ http://repo.openeuler.org/openEuler-20.03-LTS/everything/aarch64/Packages/openEuler-release-20.03LTS-33.oe1.aarch64.rpm
     # yum
     mkdir -p ${WORKDIR}/rootfs/etc/yum.repos.d
-    curl -o ${WORKDIR}/rootfs/etc/yum.repos.d/openEuler-20.03-LTS.repo https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo
+    # Mainline glibc
+    echo -e "[Mainline]
+name=Mainline
+baseurl=http://119.3.219.20:82/openEuler:/Mainline/standard_aarch64/
+enabled=1
+gpgcheck=0" > ${WORKDIR}/rootfs/etc/yum.repos.d/openEuler-20.03-LTS.repo
+    dnf --installroot=${WORKDIR}/rootfs/ --nodocs install glibc -y
+    # openEuler.repo
+    # curl -o ${WORKDIR}/rootfs/etc/yum.repos.d/openEuler-20.03-LTS.repo https://gitee.com/src-openeuler/openEuler-repos/raw/openEuler-20.03-LTS/generic.repo
+    # EulixOS.daily.repo
+    echo -e "[OS]
+name=OS
+baseurl=https://isrc.iscas.ac.cn/eulixos/repo/dailybuild/1/packages/aarch64/latest/
+enabled=1
+gpgcheck=0
+
+[source]
+name=source
+baseurl=https://isrc.iscas.ac.cn/eulixos/repo/dailybuild/1/packages/source/
+enabled=1
+gpgcheck=0" > ${WORKDIR}/rootfs/etc/yum.repos.d/openEuler-20.03-LTS.repo
+
     # dnf
-    dnf --installroot=${WORKDIR}/rootfs/ install dnf --nogpgcheck -y
+    dnf --installroot=${WORKDIR}/rootfs/ --nodocs install dnf --nogpgcheck -y
     # others
     dnf --installroot=${WORKDIR}/rootfs/ makecache
-    dnf --installroot=${WORKDIR}/rootfs/ install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth security-tool crda
+    dnf --installroot=${WORKDIR}/rootfs/ install --nodocs NetworkManager openssh-server openssh-clients -y
+    dnf --installroot=${WORKDIR}/rootfs/ autoremove
+    dnf --installroot=${WORKDIR}/rootfs/ clean all
+    # dnf --installroot=${WORKDIR}/rootfs/ --nodocs install -y alsa-utils wpa_supplicant vim net-tools iproute iputils NetworkManager openssh-server passwd hostname ntp bluez pulseaudio-module-bluetooth security-tool crda
     # Configs
     ## hosts
     ### Use rootfs-sample
@@ -43,7 +66,8 @@ prepare_rootfs(){
     # firmware
     mkdir -p ${WORKDIR}/rootfs/lib/firmware ${WORKDIR}/rootfs/usr/bin ${WORKDIR}/rootfs/lib/udev/rules.d ${WORKDIR}/rootfs/lib/systemd/system
     cp -a ${WORKDIR}/bluez-firmware/broadcom/* ${WORKDIR}/rootfs/lib/firmware/
-    cp -a ${WORKDIR}/firmware-nonfree/brcm/ ${WORKDIR}/rootfs/lib/firmware/
+    mkdir -p ${WORKDIR}/rootfs/lib/firmware/brcm/
+    cp ${WORKDIR}/firmware-nonfree/brcm/brcmfmac43455* ${WORKDIR}/rootfs/lib/firmware/brcm/
     cp -a raspberrypi-sys-mods/etc.armhf/udev/rules.d/99-com.rules ${WORKDIR}/rootfs/lib/udev/rules.d/
     cp -a pi-bluetooth/usr/bin/* ${WORKDIR}/rootfs/usr/bin/
     cp -a pi-bluetooth/lib/udev/rules.d/90-pi-bluetooth.rules ${WORKDIR}/rootfs/lib/udev/rules.d/
@@ -71,7 +95,7 @@ rootfs_config(){
     ## timezone
     ## hciuart
     ## exit
-    chroot ${WORKDIR}/rootfs /bin/bash -c "systemctl enable sshd; echo root:admin | chpasswd; echo openEuler-raspberrypi > /etc/hostname; rm -f /etc/localtime; ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime; systemctl enable hciuart; iw reg set CN; exit;"
+    chroot ${WORKDIR}/rootfs /bin/bash -c "systemctl enable sshd; echo root:admin | chpasswd; echo openEuler-raspberrypi > /etc/hostname; rm -f /etc/localtime; ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime; systemctl enable hciuart; exit;"
     ## umount
     umount -l ${WORKDIR}/rootfs/dev
     umount -l ${WORKDIR}/rootfs/proc
@@ -116,11 +140,11 @@ after_mount_copy_boot(){
     cd ${WORKDIR}/boot
     mkdir overlays/
     cp -r ${WORKDIR}/firmware/boot/* ${WORKDIR}/boot/
-    rm *.dtb cmdline.txt kernel.img kernel7*.img
+    rm *.dtb kernel.img kernel7*.img
     # kernel
     cp ${WORKDIR}/${KERNEL_REPO}/Image ${WORKDIR}/boot/kernel8.img
     # device tree
-    cp ${WORKDIR}/${KERNEL_REPO}/*.dtb ${WORKDIR}/boot/
+    cp ${WORKDIR}/${KERNEL_REPO}/bcm2711-rpi-4-b.dtb ${WORKDIR}/boot/
     cp ${WORKDIR}/${KERNEL_REPO}/overlays/* ${WORKDIR}/boot/overlays/
     # add cmdline.txt
     echo "console=ttyAMA0,115200 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline rootwait" > cmdline.txt
