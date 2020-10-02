@@ -1,0 +1,21 @@
+[submodule "bluez-firmware"]
+	path = bluez-firmware
+	url = https://github.com/RPi-Distro/bluez-firmware.git
+[submodule "firmware"]
+	path = firmware
+	url = https://github.com/raspberrypi/firmware.git
+[submodule "firmware-nonfree"]
+	path = firmware-nonfree
+	url = https://github.com/RPi-Distro/firmware-nonfree.git
+[submodule "pi-bluetooth"]
+	path = pi-bluetooth
+	url = https://github.com/RPi-Distro/pi-bluetooth.git
+[submodule "raspberrypi-sys-mods"]
+	path = raspberrypi-sys-mods
+	url = https://github.com/RPi-Distro/raspberrypi-sys-mods.git
+[submodule "kernel"]
+	path = kernel
+	url = https://github.com/earlytobed/kernel.git
+[submodule "raspberrypi-kernel"]
+	path = raspberrypi-kernel
+	url = https://github.com/earlytobed/raspberrypi-kernel.git
