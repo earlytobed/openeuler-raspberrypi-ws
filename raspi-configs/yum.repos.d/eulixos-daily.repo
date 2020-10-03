@@ -1,0 +1,11 @@
+[OS]
+name=OS
+baseurl=https://isrc.iscas.ac.cn/eulixos/repo/dailybuild/1/packages/aarch64/latest/
+enabled=1
+gpgcheck=0
+
+[source]
+name=source
+baseurl=https://isrc.iscas.ac.cn/eulixos/repo/dailybuild/1/packages/source/
+enabled=1
+gpgcheck=0
