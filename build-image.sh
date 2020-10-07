@@ -2,10 +2,10 @@
 # Environment
 export WORKDIR=$(pwd)
 export KERNEL_REPO=kernel
-eulixos=$(pwd)/raspi-configs/eulixos-daily.repo
-lts=$(pwd)/raspi-configs/openEuler-20.03-LTS.repo.repo
-mainline=$(pwd)/raspi-configs/openEuler-20.03-LTS.repo.repo
-TARGET=
+eulixos=$(pwd)/raspi-configs/yum.repos.d/eulixos-daily.repo
+lts=$(pwd)/raspi-configs/yum.repos.d/openEuler-20.03-LTS.repo
+mainline=$(pwd)/raspi-configs/yum.repos.d/openEuler-mainline.repo
+TARGET=mainline
 
 clean(){
     cd ${WORKDIR}
@@ -28,10 +28,10 @@ prepare_rootfs(){
     # yum
     mkdir -p ${WORKDIR}/rootfs/etc/yum.repos.d
     # Mainline glibc
-    cp ${mainline} ${WORKDIR}/rootfs/etc/yum.repos.d/
+    cp ${mainline} ${WORKDIR}/rootfs/etc/yum.repos.d/working.repo
     dnf --installroot=${WORKDIR}/rootfs/ --nodocs install glibc -y
     # EulixOS.daily.repo else
-    cp ${eulixos} ${WORKDIR}/rootfs/etc/yum.repos.d/
+    cp ${eulixos} ${WORKDIR}/rootfs/etc/yum.repos.d/working.repo
     # dnf
     dnf --installroot=${WORKDIR}/rootfs/ --nodocs install dnf -y
     # others
@@ -158,10 +158,13 @@ sync_and_umount(){
 
 if [ -n "$1" ]; then
     if [ $1 == "clean" ]; then
-        echo "cleaning"
         clean && exit 0
+    else
+        exit 1
     fi
 fi
+
+set -e
 
 clean
 prepare_rootfs
