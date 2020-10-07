@@ -79,7 +79,7 @@ rootfs_config(){
     ## timezone
     ## hciuart
     ## exit
-    chroot ${WORKDIR}/rootfs /bin/bash -c "systemctl enable sshd; echo root:admin | chpasswd; echo openEuler-raspberrypi > /etc/hostname; rm -f /etc/localtime; ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime; systemctl enable hciuart; exit;"
+    chroot ${WORKDIR}/rootfs /bin/bash -c "systemctl enable sshd; echo root:admin | chpasswd; echo openEuler-raspberrypi > /etc/hostname; rm -f /etc/localtime; ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime; systemctl enable hciuart; systemctl enable getty@tty1; exit;"
     ## umount
     umount -l ${WORKDIR}/rootfs/dev
     umount -l ${WORKDIR}/rootfs/proc
