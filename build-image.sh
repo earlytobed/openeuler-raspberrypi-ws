@@ -30,8 +30,9 @@ prepare_rootfs(){
     # Mainline glibc
     cp ${mainline} ${WORKDIR}/rootfs/etc/yum.repos.d/working.repo
     dnf --installroot=${WORKDIR}/rootfs/ --nodocs install glibc -y
-    # EulixOS.daily.repo else
-    cp ${eulixos} ${WORKDIR}/rootfs/etc/yum.repos.d/working.repo
+    echo "LANG=en_US.UTF-8" > ${WORKDIR}/rootfs/etc/locale.conf
+    # lts.repo else
+    cp ${lts} ${WORKDIR}/rootfs/etc/yum.repos.d/working.repo
     # dnf
     dnf --installroot=${WORKDIR}/rootfs/ --nodocs install dnf -y
     # others
