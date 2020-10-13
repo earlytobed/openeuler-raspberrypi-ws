@@ -5,7 +5,7 @@ export KERNEL_REPO=kernel
 eulixos=$(pwd)/raspi-configs/yum.repos.d/eulixos-daily.repo
 lts=$(pwd)/raspi-configs/yum.repos.d/openEuler-20.03-LTS.repo
 mainline=$(pwd)/raspi-configs/yum.repos.d/openEuler-mainline.repo
-TARGET=mainline
+TARGET=${lts}
 
 clean(){
     cd ${WORKDIR}
@@ -27,12 +27,8 @@ prepare_rootfs(){
     rpm -ivh --nodeps --root ${WORKDIR}/rootfs/ http://repo.openeuler.org/openEuler-20.03-LTS/everything/aarch64/Packages/openEuler-release-20.03LTS-33.oe1.aarch64.rpm
     # yum
     mkdir -p ${WORKDIR}/rootfs/etc/yum.repos.d
-    # Mainline glibc
-    cp ${mainline} ${WORKDIR}/rootfs/etc/yum.repos.d/working.repo
-    dnf --installroot=${WORKDIR}/rootfs/ --nodocs install glibc -y
-    echo "LANG=en_US.UTF-8" > ${WORKDIR}/rootfs/etc/locale.conf
-    # lts.repo else
-    cp ${lts} ${WORKDIR}/rootfs/etc/yum.repos.d/working.repo
+    # lts.repo
+    cp ${TARGET} ${WORKDIR}/rootfs/etc/yum.repos.d/working.repo
     # dnf
     dnf --installroot=${WORKDIR}/rootfs/ --nodocs install dnf -y
     # others
@@ -174,5 +170,5 @@ create_image_parted_losetup_kpartx_format_mkdir_mount_fstab
 after_mount_copy_boot
 after_mount_copy_rootfs
 sync_and_umount
-gzip openEuler_raspi.img
+xz openEuler_raspi.img
 echo done!
