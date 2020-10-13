@@ -5,7 +5,7 @@ export KERNEL_REPO=kernel
 eulixos=$(pwd)/raspi-configs/yum.repos.d/eulixos-daily.repo
 lts=$(pwd)/raspi-configs/yum.repos.d/openEuler-20.03-LTS.repo
 mainline=$(pwd)/raspi-configs/yum.repos.d/openEuler-mainline.repo
-TARGET=${lts}
+TARGET=${mainline}
 
 clean(){
     cd ${WORKDIR}
@@ -27,7 +27,7 @@ prepare_rootfs(){
     rpm -ivh --nodeps --root ${WORKDIR}/rootfs/ http://repo.openeuler.org/openEuler-20.03-LTS/everything/aarch64/Packages/openEuler-release-20.03LTS-33.oe1.aarch64.rpm
     # yum
     mkdir -p ${WORKDIR}/rootfs/etc/yum.repos.d
-    # lts.repo
+    # mainline.repo
     cp ${TARGET} ${WORKDIR}/rootfs/etc/yum.repos.d/working.repo
     # dnf
     dnf --installroot=${WORKDIR}/rootfs/ --nodocs install dnf -y
